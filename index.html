@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دَرْب | DARB</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 22px;
+  background: #101522;
+  color: #f1f5ff;
+  font-family: Arial, sans-serif;
+}
+.container {
+  max-width: 520px;
+  margin: auto;
+}
+header { margin: 15px 0 30px; }
+h1 { color: #83aaff; font-size: 35px; margin: 0; }
+.subtitle { color: #9ba9c0; }
+.card {
+  background: #1b2537;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+}
+.stats {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+.number {
+  font-size: 27px;
+  color: #83aaff;
+  font-weight: bold;
+}
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #34435c;
+  border-radius: 10px;
+  background: #101522;
+  color: white;
+  margin: 10px 0;
+  font-size: 16px;
+}
+button {
+  background: #477cf0;
+  color: white;
+  border: 0;
+  padding: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.add { width: 100%; }
+.task {
+  background: #263249;
+  padding: 13px;
+  border-radius: 10px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.task.done span {
+  text-decoration: line-through;
+  color: #8b9bb1;
+}
+.delete { background: #a94350; }
+small { color: #aab7cb; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+<h1>دَرْب.</h1>
+<p class="subtitle">طريقك نحو إنجاز أكبر.</p>
+</header>
+
+<div class="card">
+<h3>ملخص إنجازك</h3>
+<div class="stats">
+<div>
+<div class="number" id="total">0</div>
+<small>كل المهام</small>
+</div>
+<div>
+<div class="number" id="completed">0</div>
+<small>المنجزة</small>
+</div>
+<div>
+<div class="number" id="remaining">0</div>
+<small>المتبقية</small>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>أضف مهمة جديدة</h3>
+<input id="taskInput"
+placeholder="مثلاً: دراسة الرياضيات">
+<button class="add" onclick="addTask()">
++ إضافة المهمة
+</button>
+</div>
+
+<div class="card">
+<h3>قائمة مهامي</h3>
+<div id="tasks"></div>
+</div>
+
+<p class="subtitle" style="text-align:center">
+دَرْب © 2026
+</p>
+
+</div>
+
+<script>
+let tasks = JSON.parse(
+localStorage.getItem("darb_tasks") || "[]"
+);
+
+function save() {
+localStorage.setItem(
+"darb_tasks", JSON.stringify(tasks)
+);
+render();
+}
+
+function addTask() {
+let input = document.getElementById("taskInput");
+let name = input.value.trim();
+
+if (!name) return;
+
+tasks.push({name: name, done: false});
+input.value = "";
+save();
+}
+
+function toggleTask(index) {
+tasks[index].done = !tasks[index].done;
+save();
+}
+
+function deleteTask(index) {
+tasks.splice(index, 1);
+save();
+}
+
+function render() {
+let list = document.getElementById("tasks");
+list.innerHTML = "";
+
+tasks.forEach((task, index) => {
+let div = document.createElement("div");
+div.className = "task" + (task.done ? " done" : "");
+
+let span = document.createElement("span");
+span.textContent = task.name;
+span.style.flex = "1";
+
+let check = document.createElement("button");
+check.textContent = task.done ? "إلغاء" : "✓";
+check.onclick = () => toggleTask(index);
+
+let del = document.createElement("button");
+del.textContent = "×";
+del.className = "delete";
+del.onclick = () => deleteTask(index);
+
+div.append(span, check, del);
+list.appendChild(div);
+});
+
+let done = tasks.filter(t => t.done).length;
+
+document.getElementById("total").textContent = tasks.length;
+document.getElementById("completed").textContent = done;
+document.getElementById("remaining").textContent = tasks.length - done;
+}
+
+render();
+</script>
+</body>
+</html>
+
